@@ -1,0 +1,30 @@
+#!/bin/bash
+# Instala el script process_priority_adjuster.sh en el crontab de linux para que se ejecute cada 15 minutos
+echo "Instalando otimización kde cuando hay muchos contenedores. ;)"
+# Archivo que contiene la contraseña sudo
+filePass="pass"
+# Definir el nombre del archivo
+fileName="process_priority_adjuster.sh"
+# Leer la contraseña del archivo
+password=$(cat "$filePass")
+# Ejecutar sudo -v con la contraseña para evitar que pida contraseña sudo después de este punto
+echo "$password" | sudo -S -v
+# Verificar si sudo -v fue exitoso
+if [ $? -eq 0 ]; then
+    echo "Autenticación exitosa de sudo"
+else
+    echo "Error de autenticación. Verifica la contraseña sudo en el archivo $filePass."
+fi
+sudo -v
+# Capturar la ruta absoluta del directorio
+ruta_script=$(dirname "$(readlink -f "$0")")
+# Definir la ruta completa del archivo a ejecutar
+filePath="$ruta_script/$fileName"
+# Dar permisos de ejecución al archivo
+chmod +x "$fileName"
+# Agregar una tarea cron para ejecutar el archivo cada 15 minutos
+(crontab -l ; echo "*/15 * * * * $filePath") | crontab -
+echo ""
+echo ""
+echo "Tareas programadas:"
+crontab -l
